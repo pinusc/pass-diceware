@@ -57,7 +57,7 @@ if [[ "$(head -n 1 "$dicefile")" = "-----BEGIN PGP SIGNED MESSAGE-----" ]]; then
     [[ "$?" -eq 0 ]] || die "The file $WORDLIST_DIR has an invalid GPG signature."
     local diceware_signed_key=$(echo "$verified" | sed -rn "s/.*using RSA key (\S*).*/\1/p")
     local diceware_signed_user=$(echo "$verified" | sed -rn "s/.*Good signature from (\".*?\").*/\1/p")
-    printf "GPG check:\n  The diceware file \e[1m\e[37m%s\e[0m\n  was signed with key \e[1m\e[37m%s\e[0m\n  by user \e[1m\e[37m%s\e[0m\n" "$dicefile" "$diceware_signed_key" "$diceware_signed_user" 
+    printf "GPG check:\n  The diceware file\t\e[32m%s\e[0m\n  was signed with key\t\e[32m%s\e[0m\n  by user\t\t\e[32m%s\e[0m\n" "$dicefile" "$diceware_signed_key" "$diceware_signed_user" 
 else
     echo "The provided dicefile does not have any gpg signature."
 fi
