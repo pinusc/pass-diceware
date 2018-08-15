@@ -59,7 +59,7 @@ if [[ "$(head -n 1 "$dicefile")" = "-----BEGIN PGP SIGNED MESSAGE-----" ]]; then
     local diceware_signed_user=$(echo "$verified" | sed -rn "s/.*Good signature from (\".*?\").*/\1/p")
     printf "GPG check:\n  The diceware file\t\e[32m%s\e[0m\n  was signed with key\t\e[32m%s\e[0m\n  by user\t\t\e[32m%s\e[0m\n" "$dicefile" "$diceware_signed_key" "$diceware_signed_user" 
 else
-    echo "The provided dicefile does not have any gpg signature."
+    echo -e "\e[31mThe provided dicefile does not have any gpg signature.\e[0m"
 fi
 words="$(cat $dicefile | awk '/[[:digit:]]{5}.*/{ print $2; }')" # strip gpg signature and the useless numbers
 
