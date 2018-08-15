@@ -51,11 +51,18 @@ set_git "$passfile"
 # gpg fails with signature digest conflict in message
 # There should be a line after BEGIN-PGP-SIGNED-MESSAGE specifying the hash algo used, but it is missing
 # TODO: When the issue is solved, uncomment the lines below
-# VERIFY="$(gpg --verify $WORDLIST_DIR)"
-# [[ "$?" -eq 0 ]] || die "The file $WORDLIST_DIR has an invalid GPG signature."
+if [[ "$(head -n 1 "$dicefile")" = "-----BEGIN PGP SIGNED MESSAGE-----" ]]; then
+    local verified="$(gpg --verify "$dicefile" 2>&1 > /dev/null)"
+    [[ "$?" -eq 0 ]] || die "The file $WORDLIST_DIR has an invalid GPG signature."
+    local diceware_signed_key=$(echo "$verified" | sed -rn "s/.*using RSA key (\S*).*/\1/p")
+    local diceware_signed_user=$(echo "$verified" | sed -rn "s/.*Good signature from (\".*?\").*/\1/p")
+    printf "GPG check:\n  The diceware file \e[1m\e[37m%s\e[0m\n  was signed with key \e[1m\e[37m%s\e[0m\n  by user \e[1m\e[37m%s\e[0m\n" "$dicefile" "$diceware_signed_key" "$diceware_signed_user" 
+else
+    echo "The provided dicefile does not have any gpg signature."
+fi
+words="$(cat $dicefile | awk '/[[:digit:]]{5}.*/{ print $2; }')" # strip gpg signature and the useless numbers
 
-
-local pass="$(cat $dicefile | tail -n +3 | head -n -11 | shuf -n $length $WORDLIST_DIR | awk '{ print $2 }' |  tr '\n' ' ' | head -c -1)"
+local pass="$(echo "$words" | shuf -n $length $WORDLIST_DIR |  tr '\n' ' ' | head -c -1)"
 [[ "$(echo "$pass" | wc -w)" -eq $length ]] || die "Could not generate password from diceware.wordlist"
 if [[ $inplace -eq 0 ]]; then
     $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" <<<"$pass" || die "Password encryption aborted."
