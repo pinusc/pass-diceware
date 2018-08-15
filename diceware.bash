@@ -18,6 +18,7 @@
 # This is essentially a modified version of the function cmd_generate() present in the "pass" source code
 local opts qrcode=0 clip=0 force=0 characters="$CHARACTER_SET" inplace=0 pass
 local dicefile="$EXTENSIONS/diceware.wordlist.asc" # default value
+GENERATED_LENGTH=7 # This gives over 90 bits of randomness, which is enough for most applications and not too long to type or remember
 [[ -f $dicefile ]] || dicefile="$SYSTEM_EXTENSION_DIR/diceware.wordlist.asc" # if there is no user file, use system one (if it does not exist it will raise error later)
 opts="$($GETOPT -o nqcif -l no-symbols,qrcode,clip,in-place,diceware-file:,force -n "$PROGRAM" -- "$@")"
 local err=$?
